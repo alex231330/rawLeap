@@ -7,17 +7,41 @@
 using namespace Leap;
 using namespace cv;
 
-int main(int argc, char const *argv[])
-{
+
+bool isDisconnected = false;
+
+void LeapEventListener::onConnect(const Controller& controller) {
+    std::cout << "Connected" << std::endl;
+    isDisconnected = 0;
+    // Enable gestures, set Config values:
+    controller.config().setFloat("Gesture.Swipe.MinLength", 200.0);
+    controller.config().save();
+}
+
+//Not dispatched when running in a debugger
+void LeapEventListener::onDisconnect(const Controller& controller) {
+    isDisconnected = 1;
+    std::cout << "Disconnected" << std::endl;
+}
+
+void LeapEventListener::onFrame(const Controller& controller) {
+    std::cout << "New frame available" << std::endl;
+    Frame frame = controller.frame();
+    // Process this frame's data...
+}
+
+int main() {
     /* code */
+    bool isConnected = true;
     Leap::Controller controller;
     LeapEventListener listener;
     controller.addListener(listener);
-    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
-    if (controller.isConnected()){
-        std::cout << "Leap motion connected! \n";
-    }else{
-        std::cout << "Leap motion disconneted! \n";
+    while(1) {
+        std::cout << isDisconnected << "\n";
+        if (waitKey(100) == 27) { //esc button
+            std::cout << "esc key is pressed \n";
+            break;
+        }
     }
     return 0;
 }
