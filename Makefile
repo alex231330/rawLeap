@@ -4,4 +4,4 @@ main: main.cpp
 	$(CXX) -Wall -g -I../include main.cpp -o main $(LEAP_LIBRARY)
 
 clean:
-	rm -rf main 
+	rm -rf main q
