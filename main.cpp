@@ -9,13 +9,12 @@ using namespace cv;
 
 
 bool isDisconnected = false;
+Mat src;
 
 void LeapEventListener::onConnect(const Controller& controller) {
     std::cout << "Connected" << std::endl;
     isDisconnected = 0;
     // Enable gestures, set Config values:
-    controller.config().setFloat("Gesture.Swipe.MinLength", 200.0);
-    controller.config().save();
 }
 
 //Not dispatched when running in a debugger
@@ -27,7 +26,17 @@ void LeapEventListener::onDisconnect(const Controller& controller) {
 void LeapEventListener::onFrame(const Controller& controller) {
     std::cout << "New frame available" << std::endl;
     Frame frame = controller.frame();
-    // Process this frame's data...
+    ImageList images = frame.images();
+    Mat leftMat;
+    Mat rightMat;
+    if (images.count() >= 2)
+    {
+        leftMat = Mat(images[0].height(), images[0].width(), CV_8UC1, (void *)images[0].data());
+        rightMat = Mat(images[1].height(), images[1].width(), CV_8UC1, (void *)images[1].data());
+        imshow("leftMat", leftMat);
+        imshow("rightMat", rightMat);
+        waitKey(1);
+    }
 }
 
 int main() {
@@ -35,13 +44,10 @@ int main() {
     bool isConnected = true;
     Leap::Controller controller;
     LeapEventListener listener;
+    std::cout << "Started \n";
     controller.addListener(listener);
-    while(1) {
-        std::cout << isDisconnected << "\n";
-        if (waitKey(100) == 27) { //esc button
-            std::cout << "esc key is pressed \n";
-            break;
-        }
-    }
+    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
+    controller.setPolicy(Leap::Controller::POLICY_IMAGES);
+    std::cin.get();
     return 0;
 }
