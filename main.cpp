@@ -48,6 +48,7 @@ void LeapEventListener::onFrame(const Controller& controller) {
     ImageList images = frame.images();
     Mat leftMat, rightMat;
     Mat leftDisp, rightDisp;
+    Mat filteredDisp, filtered_disp_vis;
     if (images.count() >= 2)
     {
         wls_filter->setLambda(float(lambda) / 10);
@@ -65,12 +66,13 @@ void LeapEventListener::onFrame(const Controller& controller) {
         std::cout << leftDisp.empty() << "\n";
         std::cout << leftDisp.channels() << "\n";
 
-        wls_filter->filter(leftDisp, leftDisp, disp, rightDisp);
+        wls_filter->filter(leftDisp, left, filteredDisp, rightDisp);
+        getDisparityVis(filtered_disp, filtered_disp_vis);
 
         //normalize(disp, disp, 0, 255, CV_MINMAX, CV_8UC3);
         imshow("leftMat", leftMat);
         imshow("rightMat", rightMat);
-        imshow("Stereo", disp);
+        imshow("Stereo", filtered_disp_vis);
         waitKey(1);
     }
 }
